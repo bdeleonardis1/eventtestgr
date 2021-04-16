@@ -41,7 +41,7 @@ func (es *eventsServer) ClearEvents(ctx context.Context, _ *pb.Empty) (*pb.Empty
 	return getEmpty(), nil
 }
 
-func StartServer() {
+func StartServer() *grpc.Server {
 	lis, err := net.Listen("tcp", "localhost:11111")
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
@@ -50,4 +50,5 @@ func StartServer() {
 	grpcServer := grpc.NewServer(opts...)
 	pb.RegisterEventsServer(grpcServer, newEventsServer())
 	go grpcServer.Serve(lis)
+	return grpcServer
 }

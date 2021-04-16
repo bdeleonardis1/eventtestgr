@@ -16,8 +16,12 @@ const (
 	Unordered
 )
 
-func StartListening() {
-	server.StartServer()
+type StoppableServer interface {
+	GracefulStop()
+}
+
+func StartListening() StoppableServer {
+	return server.StartServer()
 }
 
 func EmitEvent(name string) error {

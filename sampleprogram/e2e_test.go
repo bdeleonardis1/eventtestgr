@@ -14,8 +14,8 @@ const (
 )
 
 func TestParity(t *testing.T) {
-	api.StartListening()
-	//defer events.StopListening(server)
+	server := api.StartListening()
+	defer server.GracefulStop()
 
 	testCases := []struct {
 		input          string
@@ -81,8 +81,8 @@ func TestParity(t *testing.T) {
 }
 
 func TestExpectEventsDemo(t *testing.T) {
-	//api.StartListening()
-	//defer events.StopListening(server)
+	server := api.StartListening()
+	defer server.GracefulStop()
 
 	api.ClearEvents()
 
