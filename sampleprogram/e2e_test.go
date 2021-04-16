@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/bdeleonardis1/eventtestgr/api"
 	"github.com/bdeleonardis1/eventtestgr/events"
+	"github.com/bdeleonardis1/eventtestgr/eventtest"
 )
 
 const (
@@ -14,7 +14,7 @@ const (
 )
 
 func TestParity(t *testing.T) {
-	server := api.StartListening()
+	server := eventtest.StartListening()
 	defer server.GracefulStop()
 
 	testCases := []struct {
@@ -26,42 +26,42 @@ func TestParity(t *testing.T) {
 			input:    "1",
 			expected: "1 is an odd number",
 			expectedEvents: []*events.Event{
-				api.NewEvent("1Optimization"),
+				eventtest.NewEvent("1Optimization"),
 			},
 		},
 		{
 			input:    "2",
 			expected: "2 is an even number",
 			expectedEvents: []*events.Event{
-				api.NewEvent("OptimizedSingleDigit"),
+				eventtest.NewEvent("OptimizedSingleDigit"),
 			},
 		},
 		{
 			input:    "11",
 			expected: "11 is an odd number",
 			expectedEvents: []*events.Event{
-				api.NewEvent("convertToNumber"), api.NewEvent("Modding"), api.NewEvent("TheVeryEnd"),
+				eventtest.NewEvent("convertToNumber"), eventtest.NewEvent("Modding"), eventtest.NewEvent("TheVeryEnd"),
 			},
 		},
 		{
 			input:    "-3",
 			expected: "-3 is an odd number",
 			expectedEvents: []*events.Event{
-				api.NewEvent("convertToNumber"), api.NewEvent("OptimizedNegativeSingleDigit"),
+				eventtest.NewEvent("convertToNumber"), eventtest.NewEvent("OptimizedNegativeSingleDigit"),
 			},
 		},
 		{
 			input:    "-4",
 			expected: "-4 is an even number",
 			expectedEvents: []*events.Event{
-				api.NewEvent("convertToNumber"), api.NewEvent("OptimizedNegativeSingleDigit"),
+				eventtest.NewEvent("convertToNumber"), eventtest.NewEvent("OptimizedNegativeSingleDigit"),
 			},
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.input, func(t *testing.T) {
-			api.ClearEvents()
+			eventtest.ClearEvents()
 
 			cmd := exec.Command("./sampleprogram")
 			cmd.Stdin = strings.NewReader(tc.input)
@@ -75,16 +75,16 @@ func TestParity(t *testing.T) {
 				t.Errorf("expected '%v', but got '%v'", expectedBase+tc.expected, outString)
 			}
 
-			api.ExpectExactEvents(t, tc.expectedEvents)
+			eventtest.ExpectExactEvents(t, tc.expectedEvents)
 		})
 	}
 }
 
 func TestExpectEventsDemo(t *testing.T) {
-	server := api.StartListening()
+	server := eventtest.StartListening()
 	defer server.GracefulStop()
 
-	api.ClearEvents()
+	eventtest.ClearEvents()
 
 	cmd := exec.Command("./sampleprogram")
 	cmd.Stdin = strings.NewReader("19")
@@ -93,11 +93,11 @@ func TestExpectEventsDemo(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	api.ExpectEvents(t, []*events.Event{api.NewEvent("convertToNumber"), api.NewEvent("TheVeryEnd")}, api.Ordered)
-	api.ExpectEvents(t, []*events.Event{api.NewEvent("TheVeryEnd"), api.NewEvent("convertToNumber")}, api.Unordered)
+	eventtest.ExpectEvents(t, []*events.Event{eventtest.NewEvent("convertToNumber"), eventtest.NewEvent("TheVeryEnd")}, eventtest.Ordered)
+	eventtest.ExpectEvents(t, []*events.Event{eventtest.NewEvent("TheVeryEnd"), eventtest.NewEvent("convertToNumber")}, eventtest.Unordered)
 
-	api.UnexpectedEvents(t, []*events.Event{api.NewEvent("1Optimization"), api.NewEvent("OptimizedNegativeSingleDigit")})
+	eventtest.UnexpectedEvents(t, []*events.Event{eventtest.NewEvent("1Optimization"), eventtest.NewEvent("OptimizedNegativeSingleDigit")})
 
 	// should fail.
-	api.ExpectEvents(t, []*events.Event{api.NewEvent("TheVeryEnd"), api.NewEvent("convertToNumber")}, api.Ordered)
+	eventtest.ExpectEvents(t, []*events.Event{eventtest.NewEvent("TheVeryEnd"), eventtest.NewEvent("convertToNumber")}, eventtest.Ordered)
 }
