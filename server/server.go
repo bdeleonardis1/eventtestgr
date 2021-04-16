@@ -1,4 +1,4 @@
-package server
+package main
 
 import (
 	"context"
@@ -21,12 +21,7 @@ type routeGuideServer struct {
 }
 
 func (s *routeGuideServer) GetFeature(ctx context.Context, point *pb.Point) (*pb.Feature, error) {
-	for _, feature := range s.savedFeatures {
-		if proto.Equal(feature.Location, point) {
-			return feature, nil
-		}
-	}
-	return &pb.Feature{Location: point}, nil
+	return s.savedFeatures[0], nil
 }
 
 func (s *routeGuideServer) ListFeatures(rect *pb.Rectangle, stream pb.RouteGuide_ListFeaturesServer) error {
@@ -76,7 +71,7 @@ func (s *routeGuideServer) RouteChat(stream pb.RouteGuide_RouteChatServer) error
 
 func main() {
 	flag.Parse()
-	lis, err := net.Listen("tcp", "localhost:1000")
+	lis, err := net.Listen("tcp", "localhost:10000")
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
