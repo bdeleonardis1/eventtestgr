@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+option go_package="github.com/bdeleonardis1/eventtestgr/events";
+
+service Events {
+  rpc EmitEvent(Event) returns (Empty) {}
+  rpc GetEvents(Empty) returns (EventList) {}
+  rpc ClearEvents(Empty) returns (Empty) {}
+}
+
+message Event {
+  string name = 1;
+}
+
+message EventList {
+  repeated Event events = 1;
+}
+
+message Empty {}

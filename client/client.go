@@ -1,29 +1,25 @@
-package main
+package client
 
 import (
-	"context"
-	"flag"
-	"fmt"
 	"log"
 
 	"google.golang.org/grpc"
 
-	pb "github.com/bdeleonardis1/eventtestgr/routeguide"
+	pb "github.com/bdeleonardis1/eventtestgr/events"
 )
 
-func main() {
-	flag.Parse()
+func GetConnection() pb.EventsClient {
 	var opts []grpc.DialOption
 	opts = append(opts, grpc.WithInsecure())
 	opts = append(opts, grpc.WithBlock())
 
-	conn, err := grpc.Dial("localhost:10000", opts...)
+	conn, err := grpc.Dial("localhost:11111", opts...)
 	if err != nil {
-		log.Fatalf("fail to dial: %v", err)
+		log.Fatalf("failed to dial: %v", err)
 	}
-	defer conn.Close()
-	client := pb.NewRouteGuideClient(conn)
-	f, err := client.GetFeature(context.Background(), &pb.Point{Longitude: 409146138, Latitude: -746188906})
+	// TODO: figure out what to do about client defer conn.Close()
 
-	fmt.Println("f.Name", f.Name)
+	client := pb.NewEventsClient(conn)
+
+	return client
 }
